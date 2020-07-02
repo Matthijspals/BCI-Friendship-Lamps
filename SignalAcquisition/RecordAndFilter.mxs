@@ -29,7 +29,7 @@
 					<TypeIdentifier>(0x330306dd, 0x74a95f98)</TypeIdentifier>
 					<Name>Filename</Name>
 					<DefaultValue>record-[$core{date}-$core{time}].gdf</DefaultValue>
-					<Value>C:/Users/ericc/Documents/MSNE/Hackathon/BCI-Friendship-Lamps/Raw/record-[$core{date}-$core{time}].gdf</Value>
+					<Value>C:/Users/Svea Marie Meyer/Desktop/BCI-Friendship-Lamps/Raw/record-[$core{date}-$core{time}].gdf</Value>
 					<Modifiability>false</Modifiability>
 				</Setting>
 			</Settings>
