@@ -16,7 +16,7 @@ from threading import Thread
 import mne
 from mne.time_frequency import psd_multitaper
 
-print('hi')
+
 #################################################################################################################
 # UPDATE: The analysis causes delay for receiveEEG. Therefore we seperate the analysis and the receiveEEG.
 # Now the analysis part is in an independent thread.
