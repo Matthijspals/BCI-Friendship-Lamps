@@ -33,7 +33,9 @@ class ASR():
         self.x_c = None
         self.mixing = None
         self.threshold = None
-
+        self.recon_prev = None
+        self.counter = 0
+        
     #1: take a section of clean data
     def clean_windows(self, raw, max_bad_chans = 0.2, z_param=[-3.5, 5.5], win_len = 1, win_overlap = 0.66, picks = None):
         
@@ -186,7 +188,7 @@ class ASR():
         n_samples = raw.shape[1]
         win_samples = int(win_len*self.sf)
         offsets = np.int_(np.arange(0, n_samples - win_samples, np.round(win_samples * (1 - win_overlap))))
-        recon_prev = None
+      
         blend = (1 - np.cos(np.pi * np.arange(win_samples) / win_samples)) / 2
      
         for o in offsets:
@@ -216,15 +218,64 @@ class ASR():
 
 
             #Use raised cosine blending to smoothen transitions
-            if recon_prev is not None:
+            if self.recon_prev is not None:
                 clean = blend * np.dot(recon, window) + (1 - blend) * np.dot(recon_prev, window)
             else:
                 clean = np.dot(recon, window)
 
             out_signal[:,o:o+win_samples] = clean
-            recon_prev = recon
+            self.recon_prev = recon
 
         return out_signal
+
+    
+    
+     
+    def window_reconstruct(self, data, sf, win_len=1,  max_dims = 0.66, reconstruct_every = 32):
+        
+        if self.threshold is None:
+            print("First use calibrate() to calculate thresholds")
+            return
+
+        window = data
+        out_signal = np.zeros_like(window)
+        n_samples = window.shape[1]
+        win_samples = int(win_len*sf)
+
+        blend = (1 - np.cos(np.pi * np.arange(win_samples) / win_samples)) / 2
+
+        #eigenvalue decomposition of covariance matrix
+        cov_window = np.cov(window)
+
+        #Check if we can use eigh instead of eig! makes use of symmetric properties and returns sorted eigenvalues
+        evals, evecs = np.linalg.eig(cov_window)  # compute PCA
+        indx = np.argsort(evals)  # sort in ascending
+        evecs = np.real(evecs[:, indx])
+
+        keep = (np.real(evals[indx]) < np.sum(self.threshold.dot(evecs) ** 2, axis = 0 )) 
+
+        #don't discard first components
+        max_art = int(max_dims * self.n_channels)
+        keep += (np.arange(self.n_channels) < self.n_channels - max_art)
+        keep = np.expand_dims(keep, 0)    
+
+        if np.sum(keep)==self.n_channels:
+            recon = np.eye(self.n_channels)
+        else:
+            v_trunk_mixing = pinv(keep.T * evecs.T.dot(self.mixing))
+            recon = self.mixing.dot(v_trunk_mixing).dot(evecs.T)
+
+
+        #Use raised cosine blending to smoothen transitions
+        if self.recon_prev is not None:
+            clean = blend * np.dot(recon, window) + (1 - blend) * np.dot(recon_prev, window)
+        else:
+            clean = np.dot(recon, window)
+        
+        recon_prev = recon
+        
+        return clean
+        
 
 #calculate geometric median, used to get artifact robust covariance matrix
 #From: https://github.com/bertrandlalo/timeflux_rasr/blob/master/utils/utils.py
