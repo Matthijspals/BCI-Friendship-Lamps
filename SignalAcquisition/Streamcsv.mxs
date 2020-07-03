@@ -93,11 +93,11 @@
 			<Attributes>
 				<Attribute>
 					<Identifier>(0x1fa7a38f, 0x54edbe0b)</Identifier>
-					<Value>144</Value>
+					<Value>304</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x207c9054, 0x3c841b63)</Identifier>
-					<Value>528</Value>
+					<Value>416</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x4e7b798a, 0x183beafb)</Identifier>
@@ -136,7 +136,7 @@
 					<TypeIdentifier>(0x330306dd, 0x74a95f98)</TypeIdentifier>
 					<Name>Filename</Name>
 					<DefaultValue></DefaultValue>
-					<Value>C:/Users/Svea Marie Meyer/Desktop/BCI-Friendship-Lamps/Raw/Svea_record_session1-[2020.07.02-19.19.49].gdf</Value>
+					<Value>C:/Users/ericc/Documents/MSNE/Hackathon/Offline/Raw/svea_record-session2[2020.07.02-21.45.06].gdf</Value>
 					<Modifiability>false</Modifiability>
 				</Setting>
 				<Setting>
@@ -157,11 +157,11 @@
 			<Attributes>
 				<Attribute>
 					<Identifier>(0x1fa7a38f, 0x54edbe0b)</Identifier>
-					<Value>80</Value>
+					<Value>176</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x207c9054, 0x3c841b63)</Identifier>
-					<Value>384</Value>
+					<Value>400</Value>
 				</Attribute>
 				<Attribute>
 					<Identifier>(0x4e7b798a, 0x183beafb)</Identifier>
@@ -180,7 +180,7 @@
 	</Boxes>
 	<Links>
 		<Link>
-			<Identifier>(0x00000447, 0x000009c7)</Identifier>
+			<Identifier>(0x000022ae, 0x00006ff3)</Identifier>
 			<Source>
 				<BoxIdentifier>(0x0000555c, 0x00007bbe)</BoxIdentifier>
 				<BoxOutputIndex>1</BoxOutputIndex>
