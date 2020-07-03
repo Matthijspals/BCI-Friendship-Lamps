@@ -16,6 +16,9 @@ from threading import Thread
 import mne
 from mne.time_frequency import psd_multitaper
 import socket
+import pickle
+import pyriemann
+import sklearn
 
 
 
@@ -28,15 +31,21 @@ import socket
 # data_folder = Path("datasets/")
 # eval_raw_fname = data_folder / 'BCICIV_eval_ds1a.mat'
 # eval_raw_chans = sio.loadmat(eval_raw_fname, squeeze_me=True)["nfo"]["clab"].item()
-HEADER = 64
-PORT = 5150
-FORMAT = 'utf-8'
-DISCONNECT_MESSAGE = "quit"
-RECIEVER = "188.174.45.105" # Public IP address of Jin ask her to enable port forwarding for 5150
-ADDR = (RECIEVER, PORT)
+#HEADER = 64
+#PORT = 5150
+#PORT = 5151
+#FORMAT = 'utf-8'
+#DISCONNECT_MESSAGE = "quit"
+#RECIEVER = "188.174.45.105" # Public IP address of Jin ask her to enable port forwarding for 5150
+#ADDR = (RECIEVER, PORT)
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(ADDR)
+#client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#client.connect(ADDR)
+
+#clf = sklearn.pipeline
+
+with open('C:/Users/Svea Marie Meyer/Desktop/BCI-Friendship-Lamps/trained_rieman.pkl', 'rb') as f:
+    clf = pickle.load(f)
 
 # first resolve an EEG stream on the lab network
 print("looking for an EEG stream...")
@@ -68,8 +77,8 @@ def receiveEEGsamples(inlet, samples_buffer, timestamps_buffer):
     recv_stamp = local_clock()
     samples_buffer += sample
     timestamps_buffer += timestamp
-    samples_buffer = samples_buffer[-150:]
-    timestamps_buffer = timestamps_buffer[-150:]
+    samples_buffer = samples_buffer[-500:]
+    timestamps_buffer = timestamps_buffer[-500:]
     timestamps_buffer = [x - recv_stamp for x in timestamps_buffer]
     return samples_buffer, timestamps_buffer
 
@@ -154,22 +163,32 @@ def online_analysis():
         # artifact removal
         # feature extraction
         # load classifier
+        print(np.shape(samples_buffer))
+        if len(samples_buffer) > 499:
+            #np.asarray(samples_buffer[-500:-1].reshape(1, 18, 500))
+            samples_buffer_np = np.asarray(samples_buffer)
+            print(samples_buffer_np.shape)
+            samples_buffer_np = samples_buffer_np[:, 1:9]
+            print(samples_buffer_np.shape)
+            samples_buffer_np = samples_buffer_np.reshape(1,8, 500)
+            np.nan_to_num(samples_buffer_np, copy=False)
+            print(samples_buffer_np.shape)
+            classification_result = clf.predict(samples_buffer_np)
 
-        # with open('trained_linear_clf.pkl', 'rb') as f:
-        #    clf = pickle.load(f)
 
         # predict class
         # transfer function
-        classification_result = np.random.choice([0,1,2])
-        states = ['purple for relaxed', 'blue for stressed', 'white for neutral']
-        print(f'sending {states[int(classification_result)]}')
-        send_processed_result_of_unicorn(str(classification_result))
+            #classification_result = np.random.choice([0,1,2])
+            states = ['purple for relaxed', 'blue for stressed', 'white for neutral']
+            print(f'sending {states[int(classification_result)]}')
+            #send_processed_result_of_unicorn(str(classification_result))
         # out comment the delay while doing analysis. It's simulating the analysis time in the test.
         # send control command to spelling interface
         # control_command: 1 = left, 2 = headlight, 3 = right
         # udps.send_command_raw(random.randint(0, 1), 1)
 
-
+        else:
+            print('signal too short')
 
         time.sleep(2)
 
